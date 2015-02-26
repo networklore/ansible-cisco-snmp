@@ -1,0 +1,6 @@
+172.29.50.5
+
+[all:vars]
+ansible_connection = local
+# Example if you want to use Python from a virtualenv
+#ansible_python_interpreter = /Users/patrick/.virtualenvs/cisco/bin/python
