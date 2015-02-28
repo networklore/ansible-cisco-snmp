@@ -32,12 +32,15 @@ If you are running Ansible through a Python virtualenv you might need to change 
 
 ## Configuration of Cisco device
 
+```
 snmp-server community [write-community-string] rw [acl]
+```
 
 ## Demo
 
 Running the playbook the first time:
 
+```
 $ ansible-playbook -i hosts example-playbooks/how-to/examples-vlan.yml
 
 PLAY [all] ********************************************************************
@@ -56,9 +59,11 @@ changed: [172.29.50.5]
 
 PLAY RECAP ********************************************************************
 172.29.50.5                : ok=4    changed=3    unreachable=0    failed=0
+```
 
 Running the playbook a second time:
 
+```
 $ ansible-playbook -i hosts example-playbooks/how-to/examples-vlan.yml
 
 PLAY [all] ********************************************************************
@@ -77,6 +82,7 @@ ok: [172.29.50.5]
 
 PLAY RECAP ********************************************************************
 172.29.50.5                : ok=4    changed=0    unreachable=0    failed=0
+```
 
 
 ## Todo
