@@ -19,15 +19,15 @@ This module requires:
 * A good old Cisco switch
 
 ## Installation of Ansible module
-
+'''
 pip install --upgrade pysnmp
-
+'''
 I haven't created an installer for nelsnmp, I'm currently deciding on the structure of that module. Eventually it will be installable through pip. For now you can just download the files or clone its repo and add it to your Python path:
-
+'''
 export PYTHONPATH="$PYTHONPATH:/location/to/nelsnmp/"
-i.e.
+!i.e.
 export PYTHONPATH="$PYTHONPATH:/Users/patrick/src/nelsnmp/"
-
+'''
 If you are running Ansible through a Python virtualenv you might need to change the ansible_python_interpreter variable. Check the hosts file in this repo for an example.
 
 ## Configuration of Cisco device
