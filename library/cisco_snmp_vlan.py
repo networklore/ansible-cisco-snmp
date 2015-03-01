@@ -217,22 +217,24 @@ def main():
         vlan_defined_name = m_args['vlan_name']
     exists_vlan_id = False
     exists_vlan_name = False
-    vartable = dev.getnext(*oids)
+    try:
+        vartable = dev.getnext(*oids)
+    except Exception, err:
+        module.fail_json(msg=str(err))
+
     for varbinds in vartable:
         for oid, val in varbinds:
-           
-            current_oid = oid.prettyPrint()
-            current_val = val.prettyPrint()
-            if v.vtpVlanState in current_oid:
-                vlan_id = current_oid.rsplit('.', 1)[-1]
+
+            if v.vtpVlanState in oid:
+                vlan_id = oid.rsplit('.', 1)[-1]
                 if vlan_id == m_args['vlan_id']:
                     exists_vlan_id = True
-            if v.vtpVlanName in current_oid:
-                vlan_id = current_oid.rsplit('.', 1)[-1]
+            if v.vtpVlanName in oid:
+                vlan_id = oid.rsplit('.', 1)[-1]
                 if vlan_id == m_args['vlan_id']:
-                    if m_args['vlan_name'] == current_val:
+                    if m_args['vlan_name'] == val:
                         exists_vlan_name = True
-    
+
     return_status = changed_true
 
 
