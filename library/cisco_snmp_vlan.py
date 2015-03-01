@@ -7,15 +7,13 @@ module: cisco_snmp_vlan
 author: Patrick Ogenstad (@networklore)
 short_description: Create or delete vlans.
 description:
-    - Retrieve facts for a device using SNMP, the facts will be
-      inserted to the ansible_facts key.
+    - Creates, deletes or renames VLANs on a Cisco switch using SNMP.
 requirements:
-    - pysnmp
     - nelsnmp
 options:
     host:
         description:
-            - Set to {{ inventory_hostname }}}
+            - Typically set to {{ inventory_hostname }}}
         required: true
     version:
         description:
@@ -56,10 +54,10 @@ options:
 '''
 
 EXAMPLES = '''
-# Create or delete VLANs on Cisco IOS through SNMP set
-- cisco_snmp_vlan: host={{ inventory_hostname }} version=2c community=public
+# Create or rename vlan 12, give it the name GUESTS
+- cisco_snmp_vlan: host={{ inventory_hostname }} version=2c community=private vlan_id=12 state=present vlan_name="GUESTS"
 
-# Gather facts using SNMP version 3
+# Delete vlan 40 if present
 - cisco_snmp_vlan:
     host={{ inventory_hostname }}
     version=v3
@@ -69,6 +67,8 @@ EXAMPLES = '''
     username=snmp-user
     authkey=abc12345
     privkey=def6789
+    vlan_id=40
+    state=absent
 '''
 
 from ansible.module_utils.basic import *
@@ -79,9 +79,9 @@ try:
     import nelsnmp.cisco_oids
     o = nelsnmp.cisco_oids.CiscoOids()
    
-    has_pysnmp = True
+    has_nelsnmp = True
 except:
-    has_pysnmp = False
+    has_nelsnmp = False
 
 def create_vlan(dev,vlan_id,vlan_name):
     vlan_id = str(vlan_id)
@@ -135,8 +135,8 @@ def main():
 
     m_args = module.params
 
-    if not has_pysnmp:
-        module.fail_json(msg='Missing required pysnmp module (check docs)')
+    if not has_nelsnmp:
+        module.fail_json(msg='Missing required nelsnmp module (check docs)')
 
     # Verify that we receive a community when using snmp v2
     if m_args['version'] == "v2" or m_args['version'] == "v2c":
