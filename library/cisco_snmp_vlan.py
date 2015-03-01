@@ -77,69 +77,41 @@ from collections import defaultdict
 try:
     import nelsnmp.snmp
     import nelsnmp.cisco_oids
-    from pysnmp.proto import rfc1902
-    g = nelsnmp.cisco_oids.CiscoOids("get")
-    s = nelsnmp.cisco_oids.CiscoOids("set")
-    v = nelsnmp.cisco_oids.CiscoOids("value")
+    o = nelsnmp.cisco_oids.CiscoOids()
    
     has_pysnmp = True
 except:
     has_pysnmp = False
 
 def create_vlan(dev,vlan_id,vlan_name):
-    vlan_id = int(vlan_id)
+    vlan_id = str(vlan_id)
     
-    snmp_set = ((tuple(s.vtpVlanEditOperation + [1]), rfc1902.Integer('2')),
-                (tuple(s.vtpVlanEditBufferOwner + [1]), rfc1902.OctetString('Ansible'))
-            )    
-    dev.set(*snmp_set)  
+    dev.set(o.vtpVlanEditOperation + ".1", 2)
+    dev.set(o.vtpVlanEditBufferOwner + ".1", "Ansible")
 
-    #print "Row status"
-    snmp_set = (tuple(s.vtpVlanEditRowStatus + [1] + [vlan_id]), rfc1902.Integer('4'))
-    dev.set(snmp_set)
+    dev.set(o.vtpVlanEditRowStatus + ".1." + vlan_id, 4)
 
-    #print "VLAN type"
-    snmp_set = (tuple(s.vtpVlanEditType + [1] + [vlan_id]), rfc1902.Integer('1'))
-    dev.set(snmp_set)
+    dev.set(o.vtpVlanEditType + ".1." + vlan_id, 1)
 
-
-    #
     if vlan_name != False:
-        snmp_set = (tuple(s.vtpVlanEditName + [1] + [vlan_id]), rfc1902.OctetString(vlan_name))
-        dev.set(snmp_set)
-
+        dev.set(o.vtpVlanEditName + ".1." + vlan_id, vlan_name)
 
     # Is this really needed?
     #snmp_set = (tuple(s.vtpVlanEditDot10Said + [1] + [vlan_id]), rfc1902.OctetString('0x000186ab'))
     #dev.set(snmp_set)
 
+    dev.set(o.vtpVlanEditOperation + ".1", 3)
+    # Verify that the work is done
+    dev.set(o.vtpVlanEditOperation + ".1", 4)
 
-    #print "Setting"
-    snmp_set = ((tuple(s.vtpVlanEditOperation + [1]), rfc1902.Integer('3')))
-
-    dev.set(snmp_set)
-
-    #print "Commiting"
-    snmp_set = ((tuple(s.vtpVlanEditOperation + [1]), rfc1902.Integer('4')))
-
-    dev.set(snmp_set)
 
 def delete_vlan(dev,vlan_id):
-    vlan_id = int(vlan_id)
+    vlan_id = str(vlan_id)
 
-    snmp_set = (tuple(s.vtpVlanEditOperation + [1]), rfc1902.Integer('2'))
-                 
-    dev.set(snmp_set)
-
-    snmp_set = (tuple(s.vtpVlanEditRowStatus + [1] + [vlan_id]), rfc1902.Integer('6'))
-    dev.set(snmp_set)
-
-    snmp_set = ((tuple(s.vtpVlanEditOperation + [1]), rfc1902.Integer('3')))
-    dev.set(snmp_set)
-
-
-    snmp_set = ((tuple(s.vtpVlanEditOperation + [1]), rfc1902.Integer('4')))
-    dev.set(snmp_set)
+    dev.set(o.vtpVlanEditOperation + ".1", 2)
+    dev.set(o.vtpVlanEditRowStatus + ".1." + vlan_id, 6)
+    dev.set(o.vtpVlanEditOperation + ".1", 3)
+    dev.set(o.vtpVlanEditOperation + ".1", 4)
 
 
 def main():
@@ -165,8 +137,6 @@ def main():
 
     if not has_pysnmp:
         module.fail_json(msg='Missing required pysnmp module (check docs)')
-
-    #cmdGen = cmdgen.CommandGenerator()
 
     # Verify that we receive a community when using snmp v2
     if m_args['version'] == "v2" or m_args['version'] == "v2c":
@@ -211,9 +181,9 @@ def main():
     vlan_defined_name = False
 
     oids = []
-    oids.append(g.vtpVlanState)
+    oids.append(o.vtpVlanState)
     if m_args['vlan_name']:
-        oids.append(g.vtpVlanName)
+        oids.append(o.vtpVlanName)
         vlan_defined_name = m_args['vlan_name']
     exists_vlan_id = False
     exists_vlan_name = False
@@ -225,11 +195,11 @@ def main():
     for varbinds in vartable:
         for oid, val in varbinds:
 
-            if v.vtpVlanState in oid:
+            if o.vtpVlanState in oid:
                 vlan_id = oid.rsplit('.', 1)[-1]
                 if vlan_id == m_args['vlan_id']:
                     exists_vlan_id = True
-            if v.vtpVlanName in oid:
+            if o.vtpVlanName in oid:
                 vlan_id = oid.rsplit('.', 1)[-1]
                 if vlan_id == m_args['vlan_id']:
                     if m_args['vlan_name'] == val:
@@ -261,7 +231,7 @@ def main():
             return_status = changed_false
 
     if not desired_state:
-        vartable = dev.getnext(g.vtpVlanEditTable)
+        vartable = dev.getnext(o.vtpVlanEditTable)
         if len(vartable) > 0:
             module.fail_json(msg='Other changes are being made to the vlan database')
 
