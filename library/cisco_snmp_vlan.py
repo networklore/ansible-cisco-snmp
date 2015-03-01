@@ -17,8 +17,8 @@ options:
         required: true
     version:
         description:
-            - SNMP Version to use, v2/v2c or v3
-        choices: [ 'v2', 'v2c', 'v3' ]
+            - SNMP Version to use, 2c or 3
+        choices: [ '2c', '3' ]
         required: true
     community:
         description:
@@ -26,21 +26,21 @@ options:
         required: false
     level:
         description:
-            - Authentication level, required if version is v3
+            - Authentication level, required if version is 3
         choices: [ 'authPriv', 'authNoPriv' ]
         required: false
     username:
         description:
-            - Username for SNMPv3, required if version is v3
+            - Username for SNMPv3, required if version is 3
         required: false
     integrity:
         description:
-            - Hashing algoritm, required if version is v3
+            - Hashing algoritm, required if version is 3
         choices: [ 'md5', 'sha' ]
         required: false
     authkey:
         description:
-            - Authentication key, required if version is v3
+            - Authentication key, required if version is 3
         required: false
     privacy:
         description:
@@ -60,7 +60,7 @@ EXAMPLES = '''
 # Delete vlan 40 if present
 - cisco_snmp_vlan:
     host={{ inventory_hostname }}
-    version=v3
+    version=3
     level=authPriv
     integrity=sha
     privacy=aes
@@ -118,7 +118,7 @@ def main():
     module = AnsibleModule(
         argument_spec=dict(
             host=dict(required=True),
-            version=dict(required=True, choices=['v2', 'v2c', 'v3']),
+            version=dict(required=True, choices=['2c', '3']),
             community=dict(required=False, default=False),
             username=dict(required=False),
             level=dict(required=False, choices=['authNoPriv', 'authPriv']),
@@ -139,11 +139,11 @@ def main():
         module.fail_json(msg='Missing required nelsnmp module (check docs)')
 
     # Verify that we receive a community when using snmp v2
-    if m_args['version'] == "v2" or m_args['version'] == "v2c":
+    if m_args['version'] == "2c":
         if m_args['community'] == False:
             module.fail_json(msg='Community not set when using snmp version 2')
             
-    if m_args['version'] == "v3":
+    if m_args['version'] == "3":
         if m_args['username'] == None:
             module.fail_json(msg='Username not set when using snmp version 3')
 
@@ -162,7 +162,7 @@ def main():
             privacy_proto = cmdgen.usmDESPrivProtocol
     
     # Use SNMP Version 2
-    if m_args['version'] == "v2" or m_args['version'] == "v2c":
+    if m_args['version'] == "2c":
         dev = nelsnmp.snmp.SnmpHandler(version='2c', host=m_args['host'],
                                community=m_args['community'])
 

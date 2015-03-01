@@ -5,12 +5,10 @@
 
    tasks:
      - name: Ensure VLAN 10 is present and has the name INTERNAL
-       cisco_snmp_vlan: host={{ inventory_hostname }} version=v2c community=private vlan_id=10 state=present vlan_name="INTERNAL"
+       cisco_snmp_vlan: host={{ inventory_hostname }} version=2c community=private vlan_id=10 state=present vlan_name="INTERNAL"
      - name: Ensure VLAN 12 is present and has the name GUESTS
-       cisco_snmp_vlan: host={{ inventory_hostname }} version=v2c community=private vlan_id=12 state=present vlan_name="GUESTS"
-     
+       cisco_snmp_vlan: host={{ inventory_hostname }} version=2c community=private vlan_id=12 state=present vlan_name="GUESTS"
      - name: Ensure that VLAN 40 is created
-       cisco_snmp_vlan: host={{ inventory_hostname }} version=v2c community=private vlan_id=40 state=present
-
+       cisco_snmp_vlan: host={{ inventory_hostname }} version=2c community=private vlan_id=40 state=present
      - name: Remove VLAN 80 if it is present
-       cisco_snmp_vlan: host={{ inventory_hostname }} version=v2c community=private vlan_id=80 state=absent
+       cisco_snmp_vlan: host={{ inventory_hostname }} version=2c community=private vlan_id=80 state=absent
