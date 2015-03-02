@@ -12,3 +12,16 @@
        cisco_snmp_vlan: host={{ inventory_hostname }} version=2c community=private vlan_id=40 state=present
      - name: Remove VLAN 80 if it is present
        cisco_snmp_vlan: host={{ inventory_hostname }} version=2c community=private vlan_id=80 state=absent
+     - name: Create vlan 100 with SNMPv3
+       cisco_snmp_vlan:
+         host={{ inventory_hostname}}
+         version=3
+         vlan_id=100
+         vlan_name=SNMPV3VLAN
+         state=present
+         username=snmp_v3_user
+         level=authPriv
+         integrity=sha
+         privacy=aes
+         authkey=AuthPassword123
+         privkey=PrivPassword456
