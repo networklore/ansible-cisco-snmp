@@ -84,18 +84,15 @@ PLAY RECAP ********************************************************************
 172.29.50.5                : ok=4    changed=0    unreachable=0    failed=0
 ```
 
-
 ## Todo
 
-* Error handling (currently nelsnmp doesn't report errors)
-* SNMPv3 (I have the code ready in the other [snmp module](http://networklore.com/ansible-snmp-facts/) I released, but it hasn't been ported) 
+* Error handling (the module assumes that the SNMPv3 user/SNMPv2 community has write access to the device)
 * Ability to save running configuration to startup configuration
 
 ## Known issues
 
 * Naming conflicts: If you try to add a vlan using a name which already exists the module won't pick this up. The vlan will keep it's old name or be created without a name
 * No checking if the provided vlan_id is a valid number. I.e. the module won't complain if you try to create a vlan with id 37812942
-* Internal documentation still points to the snmp_facts module
 
 ## Potential roadmap
 
