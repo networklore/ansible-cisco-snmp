@@ -45,7 +45,7 @@ options:
     privacy:
         description:
             - Encryption algoritm, required if level is authPriv
-        choices: [ 'des', 'aes' ]
+        choices: [ 'des', '3des', 'aes', 'aes192', 'aes256' ]
         required: false
     privkey:
         description:
@@ -75,13 +75,24 @@ from ansible.module_utils.basic import *
 from collections import defaultdict
 
 try:
-    import nelsnmp.snmp
+    import nelsnmp
     import nelsnmp.cisco_oids
-    o = nelsnmp.cisco_oids.CiscoOids()
-   
+    o = nelsnmp.cisco_oids.CiscoOids()  
     has_nelsnmp = True
 except:
     has_nelsnmp = False
+
+NELSNMP_PARAMETERS = (
+    'host',
+    'community',
+    'version',
+    'level',
+    'integrity',
+    'privacy',
+    'username',
+    'authkey',
+    'privkey'
+)
 
 def create_vlan(dev,vlan_id,vlan_name):
     vlan_id = str(vlan_id)
@@ -123,7 +134,7 @@ def main():
             username=dict(required=False),
             level=dict(required=False, choices=['authNoPriv', 'authPriv']),
             integrity=dict(required=False, choices=['md5', 'sha']),
-            privacy=dict(required=False, choices=['des', 'aes']),
+            privacy=dict(required=False, choices=['des', '3des', 'aes', 'aes192', 'aes256']),
             authkey=dict(required=False),
             privkey=dict(required=False),
             state=dict(required=True, choices=['absent', 'present']),
@@ -150,34 +161,19 @@ def main():
         if m_args['level'] == "authPriv" and m_args['privacy'] == None:
             module.fail_json(msg='Privacy algorithm not set when using authPriv')
 
-            
-        if m_args['integrity'] == "sha":
-            integrity_proto = cmdgen.usmHMACSHAAuthProtocol
-        elif m_args['integrity'] == "md5":
-            integrity_proto = cmdgen.usmHMACMD5AuthProtocol
+    nelsnmp_args = {}
+    for key in m_args:
+        if key in NELSNMP_PARAMETERS and m_args[key] != None:
+            nelsnmp_args[key] = m_args[key]
 
-        if m_args['privacy'] == "aes":
-            privacy_proto = cmdgen.usmAesCfb128Protocol
-        elif m_args['privacy'] == "des":
-            privacy_proto = cmdgen.usmDESPrivProtocol
-    
-    # Use SNMP Version 2
-    if m_args['version'] == "2c":
-        dev = nelsnmp.snmp.SnmpHandler(version='2c', host=m_args['host'],
-                               community=m_args['community'])
+    try:
+        dev = nelsnmp.SnmpHandler(**nelsnmp_args)
+    except Exception, err:
+        module.fail_json(msg=str(err))
 
-    # Use SNMP Version 3 with authNoPriv
-    elif m_args['level'] == "authNoPriv":
-        snmp_auth = cmdgen.UsmUserData(m_args['username'], authKey=m_args['authkey'], authProtocol=integrity_proto)
-
-    # Use SNMP Version 3 with authPriv
-    else:
-        snmp_auth = cmdgen.UsmUserData(m_args['username'], authKey=m_args['authkey'], privKey=m_args['privkey'], authProtocol=integrity_proto, privProtocol=privacy_proto)
-
-    #Tree = lambda: defaultdict(Tree)
     changed_false = { 'changed': False }                           
     changed_true = { 'changed': True }                           
-    #results = Tree()
+
     vlan_defined_name = False
 
     oids = []
