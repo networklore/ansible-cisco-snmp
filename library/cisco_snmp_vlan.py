@@ -94,7 +94,7 @@ NELSNMP_PARAMETERS = (
     'privkey'
 )
 
-def create_vlan(dev,vlan_id,vlan_name):
+def create_vlan(dev,vlan_id,vlan_name,module):
     vlan_id = str(vlan_id)
     
     dev.set(o.vtpVlanEditOperation + ".1", 2)
@@ -115,14 +115,34 @@ def create_vlan(dev,vlan_id,vlan_name):
     # Verify that the work is done
     dev.set(o.vtpVlanEditOperation + ".1", 4)
 
+    vartable = dev.getnext(o.vtpVlanName)
+    vlan_created = False
+    for varbinds in vartable:
+        for oid, val in varbinds:
+            current_vlan_id = oid.rsplit('.', 1)[-1]
+            current_vlan_name = val
+            if vlan_name != False:
+                if current_vlan_id == vlan_id:
+                    vlan_created = True
+            else:    
+                if current_vlan_id == vlan_id and current_vlan_name == vlan_name:
+                    vlan_created = True
+    if not vlan_created:
+        module.fail_json(msg="Unable to create VLAN, check SNMP write access")
 
-def delete_vlan(dev,vlan_id):
+def delete_vlan(dev,vlan_id,module):
     vlan_id = str(vlan_id)
 
     dev.set(o.vtpVlanEditOperation + ".1", 2)
     dev.set(o.vtpVlanEditRowStatus + ".1." + vlan_id, 6)
     dev.set(o.vtpVlanEditOperation + ".1", 3)
     dev.set(o.vtpVlanEditOperation + ".1", 4)
+    vartable = dev.getnext(o.vtpVlanState)
+    for varbinds in vartable:
+        for oid, val in varbinds:
+            current_vlan_id = oid.rsplit('.', 1)[-1]
+            if current_vlan_id == vlan_id:
+                module.fail_json(msg="Unable to delete VLAN from device, check SNMP write access")
 
 
 def main():
@@ -233,10 +253,10 @@ def main():
 
         if m_args['state'] == "present":
             # Create vlan
-            create_vlan(dev,m_args['vlan_id'],vlan_defined_name)
+            create_vlan(dev,m_args['vlan_id'],vlan_defined_name, module)
         else:
             # Remove vlan
-            delete_vlan(dev, m_args['vlan_id'])
+            delete_vlan(dev, m_args['vlan_id'],module)
 
 
  
