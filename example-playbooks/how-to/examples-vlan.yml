@@ -2,6 +2,8 @@
 -  hosts: all
    connection: local
    gather_facts: no
+   vars_files:
+     - vars/vlans.yml
 
    tasks:
      - name: Ensure VLAN 10 is present and has the name INTERNAL
@@ -25,3 +27,7 @@
          privacy=aes
          authkey=AuthPassword123
          privkey=PrivPassword456
+
+     - name: Create vlan from variable
+       cisco_snmp_vlan: host={{ inventory_hostname }} version=2c community=private vlan_id={{ item.vlan_id }} vlan_name={{ item.vlan_name }} state=present
+       with_items: vlans

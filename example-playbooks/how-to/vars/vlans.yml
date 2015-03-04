@@ -1,0 +1,8 @@
+---
+vlans:
+  - vlan_name: red
+    vlan_id: 30 
+  - vlan_name: green
+    vlan_id: 31 
+  - vlan_name: blue
+    vlan_id: 32 
