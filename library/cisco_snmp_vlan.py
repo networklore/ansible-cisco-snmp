@@ -96,26 +96,31 @@ NELSNMP_PARAMETERS = (
 
 def create_vlan(dev,vlan_id,vlan_name,module):
     vlan_id = str(vlan_id)
-    
-    dev.set(o.vtpVlanEditOperation + ".1", 2)
-    dev.set(o.vtpVlanEditBufferOwner + ".1", "Ansible")
+ 
+    try:
+   
+        dev.set(o.vtpVlanEditOperation + ".1", 2)
+        dev.set(o.vtpVlanEditBufferOwner + ".1", "Ansible")
 
-    dev.set(o.vtpVlanEditRowStatus + ".1." + vlan_id, 4)
+        dev.set(o.vtpVlanEditRowStatus + ".1." + vlan_id, 4)
 
-    dev.set(o.vtpVlanEditType + ".1." + vlan_id, 1)
+        dev.set(o.vtpVlanEditType + ".1." + vlan_id, 1)
 
-    if vlan_name != False:
-        dev.set(o.vtpVlanEditName + ".1." + vlan_id, vlan_name)
+        if vlan_name != False:
+            dev.set(o.vtpVlanEditName + ".1." + vlan_id, vlan_name)
 
-    # Is this really needed?
-    #snmp_set = (tuple(s.vtpVlanEditDot10Said + [1] + [vlan_id]), rfc1902.OctetString('0x000186ab'))
-    #dev.set(snmp_set)
+        # Is this really needed?
+        #snmp_set = (tuple(s.vtpVlanEditDot10Said + [1] + [vlan_id]), rfc1902.OctetString('0x000186ab'))
+        #dev.set(snmp_set)
 
-    dev.set(o.vtpVlanEditOperation + ".1", 3)
-    # Verify that the work is done
-    dev.set(o.vtpVlanEditOperation + ".1", 4)
+        dev.set(o.vtpVlanEditOperation + ".1", 3)
+        # Verify that the work is done
+        dev.set(o.vtpVlanEditOperation + ".1", 4)
 
-    vartable = dev.getnext(o.vtpVlanName)
+        vartable = dev.getnext(o.vtpVlanName)
+    except Exception, err:
+        module.fail_json(msg='Unable to write to device')    
+
     vlan_created = False
     for varbinds in vartable:
         for oid, val in varbinds:
@@ -133,11 +138,15 @@ def create_vlan(dev,vlan_id,vlan_name,module):
 def delete_vlan(dev,vlan_id,module):
     vlan_id = str(vlan_id)
 
-    dev.set(o.vtpVlanEditOperation + ".1", 2)
-    dev.set(o.vtpVlanEditRowStatus + ".1." + vlan_id, 6)
-    dev.set(o.vtpVlanEditOperation + ".1", 3)
-    dev.set(o.vtpVlanEditOperation + ".1", 4)
-    vartable = dev.getnext(o.vtpVlanState)
+    try:
+        dev.set(o.vtpVlanEditOperation + ".1", 2)
+        dev.set(o.vtpVlanEditRowStatus + ".1." + vlan_id, 6)
+        dev.set(o.vtpVlanEditOperation + ".1", 3)
+        dev.set(o.vtpVlanEditOperation + ".1", 4)
+        vartable = dev.getnext(o.vtpVlanState)
+    except Exception, err:
+        module.fail_json(msg='Unable to write to device')    
+
     for varbinds in vartable:
         for oid, val in varbinds:
             current_vlan_id = oid.rsplit('.', 1)[-1]
