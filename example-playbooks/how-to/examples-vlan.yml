@@ -4,16 +4,21 @@
    gather_facts: no
    vars_files:
      - vars/vlans.yml
+   handlers:
+     - include: handlers/main.yml
 
    tasks:
      - name: Ensure VLAN 10 is present and has the name INTERNAL
        cisco_snmp_vlan: host={{ inventory_hostname }} version=2c community=private vlan_id=10 state=present vlan_name="INTERNAL"
      - name: Ensure VLAN 12 is present and has the name GUESTS
        cisco_snmp_vlan: host={{ inventory_hostname }} version=2c community=private vlan_id=12 state=present vlan_name="GUESTS"
+       notify: save config
      - name: Ensure that VLAN 40 is created
        cisco_snmp_vlan: host={{ inventory_hostname }} version=2c community=private vlan_id=40 state=present
+       notify: save config
      - name: Remove VLAN 80 if it is present
        cisco_snmp_vlan: host={{ inventory_hostname }} version=2c community=private vlan_id=80 state=absent
+       notify: save config
      - name: Create vlan 100 with SNMPv3
        cisco_snmp_vlan:
          host={{ inventory_hostname}}
@@ -27,7 +32,10 @@
          privacy=aes
          authkey=AuthPassword123
          privkey=PrivPassword456
+       notify: save config
 
      - name: Create vlan from variable
        cisco_snmp_vlan: host={{ inventory_hostname }} version=2c community=private vlan_id={{ item.vlan_id }} vlan_name={{ item.vlan_name }} state=present
        with_items: vlans
+       notify: save config
+
