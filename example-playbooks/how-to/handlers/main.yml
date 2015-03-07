@@ -1,0 +1,3 @@
+---
+- name: save config
+  cisco_snmp_save_config: host={{ inventory_hostname }} version=2c community=private
