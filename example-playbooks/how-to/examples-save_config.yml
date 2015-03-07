@@ -1,0 +1,9 @@
+---
+-  hosts: all
+   connection: local
+   gather_facts: no
+
+
+   tasks:
+     - name: Save the running configuration to startup
+       cisco_snmp_save_config: host={{ inventory_hostname }} version=2c community=private
