@@ -12,11 +12,11 @@ Currently this is only a test and there's a good chance that a lot of the code w
 
 ## Dependencies
 
-This module requires:
+These modules requires:
 
 * [pysnmp](http://pysnmp.sourceforge.net) 4.2.5 or later
 * [nelsnmp](https://github.com/networklore/nelsnmp)
-* A good old Cisco switch
+* A good old Cisco switch/router
 
 ## Installation of Ansible module
 ```
@@ -40,7 +40,7 @@ $ ansible-playbook -i hosts example-playbooks/how-to/examples-vlan.yml
 PLAY [all] ********************************************************************
 
 TASK: [Ensure VLAN 10 is present and has the name INTERNAL] *******************
-changed: [172.29.50.5]
+ok: [172.29.50.5]
 
 TASK: [Ensure VLAN 12 is present and has the name GUESTS] *********************
 changed: [172.29.50.5]
@@ -49,10 +49,21 @@ TASK: [Ensure that VLAN 40 is created] ****************************************
 ok: [172.29.50.5]
 
 TASK: [Remove VLAN 80 if it is present] ***************************************
+ok: [172.29.50.5]
+
+TASK: [Create vlan 100 with SNMPv3] *******************************************
+ok: [172.29.50.5]
+
+TASK: [Create vlan from variable] *********************************************
+changed: [172.29.50.5] => (item={'vlan_id': 30, 'vlan_name': 'red'})
+ok: [172.29.50.5] => (item={'vlan_id': 31, 'vlan_name': 'green'})
+changed: [172.29.50.5] => (item={'vlan_id': 32, 'vlan_name': 'blue'})
+
+NOTIFIED: [save config] *******************************************************
 changed: [172.29.50.5]
 
 PLAY RECAP ********************************************************************
-172.29.50.5                : ok=4    changed=3    unreachable=0    failed=0
+172.29.50.5                : ok=7    changed=3    unreachable=0    failed=0
 ```
 
 Running the playbook a second time:
@@ -74,8 +85,16 @@ ok: [172.29.50.5]
 TASK: [Remove VLAN 80 if it is present] ***************************************
 ok: [172.29.50.5]
 
+TASK: [Create vlan 100 with SNMPv3] *******************************************
+ok: [172.29.50.5]
+
+TASK: [Create vlan from variable] *********************************************
+ok: [172.29.50.5] => (item={'vlan_id': 30, 'vlan_name': 'red'})
+ok: [172.29.50.5] => (item={'vlan_id': 31, 'vlan_name': 'green'})
+ok: [172.29.50.5] => (item={'vlan_id': 32, 'vlan_name': 'blue'})
+
 PLAY RECAP ********************************************************************
-172.29.50.5                : ok=4    changed=0    unreachable=0    failed=0
+172.29.50.5                : ok=6    changed=0    unreachable=0    failed=0
 ```
 
 ## Todo
