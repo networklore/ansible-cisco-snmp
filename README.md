@@ -101,6 +101,7 @@ PLAY RECAP ********************************************************************
 
 * Error handling (the module assumes that the SNMPv3 user/SNMPv2 community has write access to the device)
 * Ability to save running configuration to startup configuration
+* cisco_snmp_switchport module - Add ability to set allowed VLANs on a trunk
 
 ## Known issues
 
