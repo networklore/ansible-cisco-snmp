@@ -1,0 +1,33 @@
+---
+-  hosts: all
+   connection: local
+   gather_facts: no
+
+
+   tasks:
+     - name: Change FastEthernet0/1
+       cisco_snmp_interface:
+         host={{ inventory_hostname }}
+         version=2c
+         community=private
+         interface_id=10001
+         description="*** Server 1 ***"
+         admin_state=up
+     - name: Change FastEthernet0/2
+       cisco_snmp_interface:
+         host={{ inventory_hostname }}
+         version=2c
+         community=private
+         interface_name=FastEthernet0/2
+         description="*** Server 2 ***"
+         admin_state=up
+     - name: Change FastEthernet0/3
+       cisco_snmp_interface:
+         host={{ inventory_hostname }}
+         version=2c
+         community=private
+         interface_name=FastEthernet0/3
+         description="*** unused ***"
+         admin_state=down
+
+
