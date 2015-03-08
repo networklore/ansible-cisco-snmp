@@ -1,6 +1,6 @@
 ## About
 
-This repo contains [Ansible](https://github.com/ansible/ansible) modules which use SNMP to change configuration on Cisco devices. The repo is currently in a proof of concept stage to see how you can manage older devices (which doesn't have a fancy api) with modern IT automation tools.
+This repo contains [Ansible](https://github.com/ansible/ansible) modules which use SNMP to change configuration on Cisco devices. The repo is currently in a proof of concept stage to see how you can manage older devices (which doesn't have a fancy api) with modern IT automation tools. Over at Networklore there's more information about the [Ansible for Cisco IOS SNMP modules](http://networklore.com/ansible-cisco-snmp/).
 
 ## Goal
 
