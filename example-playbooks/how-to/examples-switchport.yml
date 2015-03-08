@@ -1,0 +1,24 @@
+---
+-  hosts: all
+   connection: local
+   gather_facts: no
+
+
+   tasks:
+     - name: Change switchport config
+       cisco_snmp_switchport:
+         host={{ inventory_hostname }}
+         version=2c
+         community=private
+         mode=access
+         interface_id=10001
+         access_vlan=12
+
+     - name: Change switchport config
+       cisco_snmp_switchport:
+         host={{ inventory_hostname }}
+         version=2c
+         community=private
+         mode=trunk
+         interface_name=FastEthernet0/2
+         native_vlan=12
