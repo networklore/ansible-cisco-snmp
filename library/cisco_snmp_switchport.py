@@ -95,7 +95,7 @@ from ansible.module_utils.basic import *
 from collections import defaultdict
 
 try:
-    import nelsnmp
+    from nelsnmp.snmp import SnmpHandler
     import nelsnmp.cisco_oids
     o = nelsnmp.cisco_oids.CiscoOids()  
     has_nelsnmp = True
@@ -233,7 +233,7 @@ def main():
             nelsnmp_args[key] = m_args[key]
 
     try:
-        dev = nelsnmp.SnmpHandler(**nelsnmp_args)
+        dev = SnmpHandler(**nelsnmp_args)
     except Exception, err:
         module.fail_json(msg=str(err))
 
