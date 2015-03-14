@@ -13,7 +13,7 @@ requirements:
 options:
     host:
         description:
-            - Typically set to {{ inventory_hostname }}}
+            - Typically set to {{ inventory_hostname }}
         required: true
     version:
         description:
@@ -22,7 +22,7 @@ options:
         required: true
     community:
         description:
-            - The SNMP community string, required if version is v2/v2c
+            - The SNMP community string, required if version is 2c
         required: false
     level:
         description:
@@ -76,10 +76,10 @@ options:
 '''
 
 EXAMPLES = '''
-# Save configuration with SNMPv2
-- cisco_snmp_switchport: host={{ inventory_hostname }} version=2c community=private
+# Set interface with id 10001 to access mode in vlan 12
+- cisco_snmp_switchport: host={{ inventory_hostname }} version=2c community=private interface_id=10001 mode=access access_vlan=12
 
-# Save configuration with SNMPv3
+# Change FastEthernet0/2 to trunk mode using native vlan 12
 - cisco_snmp_switchport:
     host={{ inventory_hostname }}
     version=3
@@ -89,6 +89,9 @@ EXAMPLES = '''
     username=snmp-user
     authkey=abc12345
     privkey=def6789
+    mode=trunk
+    interface_name="FastEthernet0/2"
+    native_vlan=12
 '''
 
 from ansible.module_utils.basic import *

@@ -12,7 +12,7 @@ description:
 options:
     host:
         description:
-            - Typically set to {{ inventory_hostname }}}
+            - Typically set to {{ inventory_hostname }}
         required: true
     version:
         description:
@@ -70,11 +70,11 @@ options:
 '''
 
 EXAMPLES = '''
-# Save configuration with SNMPv2
-- cisco_snmp_interface: host={{ inventory_hostname }} version=2c community=private
+# Change description and shutdown FastEthernet0/2
+- cisco_snmp_interface: host={{ inventory_hostname }} version=2c community=private interface_name=FastEthernet0/2 description="NOT IN USE" admin_state=down
 
-# Save configuration with SNMPv3
-- cisco_snmp_switchport:
+# Change description and enable interface with id 10001
+- cisco_snmp_interface:
     host={{ inventory_hostname }}
     version=3
     level=authPriv
@@ -83,6 +83,9 @@ EXAMPLES = '''
     username=snmp-user
     authkey=abc12345
     privkey=def6789
+    interface_id=10001
+    description=AP1
+    admin_state=up
 '''
 
 from ansible.module_utils.basic import *

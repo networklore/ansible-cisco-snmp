@@ -5,7 +5,7 @@
 
 
    tasks:
-     - name: Change switchport config
+     - name: Set interface 10001 to access mode and vlan to 12
        cisco_snmp_switchport:
          host={{ inventory_hostname }}
          version=2c
@@ -14,7 +14,7 @@
          interface_id=10001
          access_vlan=12
 
-     - name: Change switchport config
+     - name: Change FastEthernet0/2 to trunk mode with native vlan 12
        cisco_snmp_switchport:
          host={{ inventory_hostname }}
          version=2c

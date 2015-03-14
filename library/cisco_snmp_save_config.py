@@ -13,7 +13,7 @@ requirements:
 options:
     host:
         description:
-            - Typically set to {{ inventory_hostname }}}
+            - Typically set to {{ inventory_hostname }}
         required: true
     version:
         description:
@@ -22,7 +22,7 @@ options:
         required: true
     community:
         description:
-            - The SNMP community string, required if version is v2/v2c
+            - The SNMP community string, required if version is 2c
         required: false
     level:
         description:
