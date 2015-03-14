@@ -1,0 +1,20 @@
+---
+-  hosts: all
+   connection: local
+   gather_facts: no
+
+   tasks:
+     - name: Globally enable CDP
+       cisco_snmp_cdp:
+         host={{ inventory_hostname }}
+         version=2c
+         community=private
+         cdp_global=enabled
+
+     - name: Disable CDP on FastEthernet0/2
+       cisco_snmp_cdp:
+         host={{ inventory_hostname }}
+         version=2c
+         community=private
+         cdp_interface=disabled
+         interface_name="FastEthernet0/2"
