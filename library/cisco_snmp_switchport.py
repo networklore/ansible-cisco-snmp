@@ -56,19 +56,19 @@ options:
             - Mode of the interface
         choices: [ 'access', 'trunk', 'desirable', 'auto', 'trunk-nonegotiate' ]
         required: True
-   interface_id:
+    interface_id:
         description:
             - The SNMP interface id (ifIndex)
         required: false
-   interface_name:
+    interface_name:
         description:
             - The name of the interface
         required: false
-   access_vlan:
+    access_vlan:
         description:
             - The access vlan id
         required: false
-   native_vlan:
+    native_vlan:
         description:
             - The native vlan id on a trunk port
         required: false

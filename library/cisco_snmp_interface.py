@@ -55,15 +55,15 @@ options:
             - Mode of the interface
         choices: [ 'up', 'down']
         required: False
-   interface_id:
+    interface_id:
         description:
             - The SNMP interface id (ifIndex)
         required: false
-   interface_name:
+    interface_name:
         description:
             - The name of the interface
         required: false
-   description:
+    description:
         description:
             - The description of the interface
         required: false

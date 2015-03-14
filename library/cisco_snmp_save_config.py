@@ -3,7 +3,7 @@
 DOCUMENTATION = '''
 ---
 
-module: cisco_snmp_vlan
+module: cisco_snmp_save_config
 author: Patrick Ogenstad (@networklore)
 short_description: Saves the configuration.
 description:
