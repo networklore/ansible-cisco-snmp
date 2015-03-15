@@ -1,0 +1,37 @@
+---
+-  hosts: all
+   connection: local
+   gather_facts: no
+
+
+   tasks:
+     - name: Enable Portsecurity on interface 10001 with 5 mac addresses
+       cisco_snmp_portsecurity:
+         host={{ inventory_hostname }}
+         version=2c
+         community=private
+         interface_id=10001
+         portsecurity=enabled
+         max=5
+         aging_static=enabled
+     - name: Disable Portsecurity on FastEthernet0/2
+       cisco_snmp_portsecurity:
+         host={{ inventory_hostname }}
+         version=2c
+         community=private
+         interface_name=FastEthernet0/2
+         portsecurity=disabled
+         max=1
+     - name: Enable Portsecurity on FastEthernet0/3 with 10 mac addresses, enable sticky
+       cisco_snmp_portsecurity:
+         host={{ inventory_hostname }}
+         version=2c
+         community=private
+         interface_name=FastEthernet0/3
+         portsecurity=enabled
+         max=10
+         sticky=enabled
+         violation=protect
+         aging_type=inactivity
+         aging_time=12
+
