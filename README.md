@@ -26,7 +26,7 @@ As new modules are added you will need to update nelsnmp to support newer MIBs.
 ```
 pip install nelsnmp --upgrade
 ```
-If you are running Ansible through a Python virtualenv you might need to change the ansible_python_interpreter variable. Check the hosts file in this repo for an example.
+If you are running Ansible through a Python virtualenv you might need to change the ansible_python_interpreter variable. Check the hosts file in this repo for an example. You can clone this repo and copy the modules to your Ansible library path. If you are unsure, check out the [quick start guide](http://networklore.com/ansible-cisco-snmp-install/)
 
 ## Configuration of Cisco device
 
