@@ -10,6 +10,7 @@
 
   * [cisco_snmp_cdp - changes cdp state globally or on an interface](#cisco_snmp_cdp)
   * [cisco_snmp_interface - configures interface settings](#cisco_snmp_interface)
+  * [cisco_snmp_portsecurity - configures interface settings](#cisco_snmp_portsecurity)
   * [cisco_snmp_save_config - saves the configuration.](#cisco_snmp_save_config)
   * [cisco_snmp_switchport - configures switchport settings](#cisco_snmp_switchport)
   * [cisco_snmp_vlan - create or delete vlans.](#cisco_snmp_vlan)
@@ -137,6 +138,65 @@ Configures interface settings
 ---
 
 
+## cisco_snmp_portsecurity
+Configures interface settings
+
+  * Synopsis
+  * Options
+  * Examples
+
+#### Synopsis
+ Configured interface settings
+ nelsnmp
+
+#### Options
+
+| Parameter     | required    | default  | choices    | comments |
+| ------------- |-------------| ---------|----------- |--------- |
+| username  |   no  |  | |  Username for SNMPv3, required if version is 3  |
+| interface_name  |   no  |  | |  The name of the interface  |
+| portsecurity  |   no  |  | <ul> <li>enabled</li>  <li>disabled</li> </ul> |  Mode of the interface  |
+| level  |   no  |  | <ul> <li>authPriv</li>  <li>authNoPriv</li> </ul> |  Authentication level, required if version is 3  |
+| violation  |   no  |  | <ul> <li>shutdown</li>  <li>restrict</li>  <li>protect</li> </ul> |  Enable or disable sticky mac addresses  |
+| max  |   no  |  | |  The maximum number of mac addresses  |
+| privacy  |   no  |  | <ul> <li>des</li>  <li>3des</li>  <li>aes</li>  <li>aes192</li>  <li>aes256</li> </ul> |  Encryption algoritm, required if level is authPriv  |
+| community  |   no  |  | |  The SNMP community string, required if version is 2c  |
+| sticky  |   no  |  | <ul> <li>enabled</li>  <li>disabled</li> </ul> |  Enable or disable sticky mac addresses  |
+| authkey  |   no  |  | |  Authentication key, required if version is 3  |
+| aging_type  |   no  |  | <ul> <li>absolute</li>  <li>inactivity</li> </ul> |  Set aging type  |
+| host  |   yes  |  | |  Typically set to {# inventory_hostname #}  |
+| version  |   yes  |  | <ul> <li>2c</li>  <li>3</li> </ul> |  SNMP Version to use, 2c or 3  |
+| aging_static  |   no  |  | <ul> <li>enabled</li>  <li>disabled</li> </ul> |  Indicates whether the secure MAC address aging mechanism is enabled on static MAC address entries  |
+| aging_time  |   no  |  | |  Mac address aging time in minutes  |
+| interface_id  |   no  |  | |  The SNMP interface id (ifIndex)  |
+| integrity  |   no  |  | <ul> <li>md5</li>  <li>sha</li> </ul> |  Hashing algoritm, required if version is 3  |
+| privkey  |   no  |  | |  Encryption key, required if version is authPriv  |
+
+#### Examples
+```
+# Enable Portsecurity on FastEthernet0/2 allow 5 hosts
+- cisco_snmp_portsecurity: host={{ inventory_hostname }} version=2c community=private interface_name=FastEthernet0/2 portsecurity=enabled max=5
+
+# Disable Portsecurity on interface 10001
+- cisco_snmp_portsecurity:
+    host={{ inventory_hostname }}
+    version=3
+    level=authPriv
+    integrity=sha
+    privacy=aes
+    username=snmp-user
+    authkey=abc12345
+    privkey=def6789
+    interface_id=10001
+    portsecurity=disabled
+    max=1
+
+```
+
+
+---
+
+
 ## cisco_snmp_save_config
 Saves the configuration.
 
@@ -254,11 +314,14 @@ Create or delete vlans.
 | username  |   no  |  | |  Username for SNMPv3, required if version is 3  |
 | level  |   no  |  | <ul> <li>authPriv</li>  <li>authNoPriv</li> </ul> |  Authentication level, required if version is 3  |
 | privacy  |   no  |  | <ul> <li>des</li>  <li>3des</li>  <li>aes</li>  <li>aes192</li>  <li>aes256</li> </ul> |  Encryption algoritm, required if level is authPriv  |
+| state  |   yes  |  | <ul> <li>absent</li>  <li>present</li> </ul> |  The desired state of the VLAN  |
 | community  |   no  |  | |  The SNMP community string, required if version is 2c  |
 | authkey  |   no  |  | |  Authentication key, required if version is 3  |
 | host  |   yes  |  | |  Typically set to {# inventory_hostname #}  |
 | version  |   yes  |  | <ul> <li>2c</li>  <li>3</li> </ul> |  SNMP Version to use, 2c or 3  |
+| vlan_name  |   no  |  | |  The name of the VLAN  |
 | integrity  |   no  |  | <ul> <li>md5</li>  <li>sha</li> </ul> |  Hashing algoritm, required if version is 3  |
+| vlan_id  |   yes  |  | |  The VLAN number  |
 | privkey  |   no  |  | |  Encryption key, required if version is authPriv  |
 
 #### Examples
