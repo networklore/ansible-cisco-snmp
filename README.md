@@ -30,9 +30,22 @@ If you are running Ansible through a Python virtualenv you might need to change 
 
 ## Configuration of Cisco device
 
+Testing: SNMPv2
 ```
 snmp-server community [write-community-string] rw [acl]
 ```
+Production: SNMPv3
+```
+ip access-list standard ACL-ANSIBLE-HOST
+ permit host 172.29.50.50
+
+snmp-server view V3ISO iso included
+
+snmp-server group ANSIBLEGRP v3 priv write V3ISO
+
+snmp-server user ansible ANSIBLEGRP v3 auth sha AuthPassword123 priv aes 128 PrivPassword123 access ACL-ANSIBLE-HOST
+```
+
 
 ## Demo
 
