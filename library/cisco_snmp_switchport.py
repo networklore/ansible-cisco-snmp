@@ -146,56 +146,17 @@ def changed_status(changed, has_changed):
         has_changed = True
     return has_changed
 
-def set_access_vlan(dev, interface, vlan, module):
-    oid = o.vmVlan + "." + str(interface)
-    vlan = int(vlan)
+def set_state(dev, oid, desired_state, module):
     try:
-        current_vlan = dev.get_value(oid)
+        current_state = dev.get_value(oid)
     except Exception, err:
         module.fail_json(msg=str(err))
-    if current_vlan == vlan:
+
+    if current_state == desired_state:
         return False
     else:
         try:
-            dev.set(oid, vlan)
-        except:
-            module.fail_json(msg='Unable to write to device')
-        return True
-
-def set_interface_mode(dev, interface, mode, module):
-    oid = o.vlanTrunkPortDynamicState + "." + str(interface)
-    try:
-        # Source = running config
-        
-        current_mode = dev.get_value(oid)
-    except Exception, err:
-        module.fail_json(msg=str(err))
-
-    if isinstance(current_mode, int):
-        if current_mode == PORT_MODE[mode]:
-            return False
-        else:
-            try:
-                dev.set(oid,PORT_MODE[mode])
-            except:
-                module.fail_json(msg='Unable to write to device')
-            return True
-
-    else:
-        module.fail_json(msg='Unable to find interface')
-
-def set_native_vlan(dev, interface, vlan, module):
-    oid = o.vlanTrunkPortNativeVlan + "." + str(interface)
-    vlan = int(vlan)
-    try:
-        current_vlan = dev.get_value(oid)
-    except Exception, err:
-        module.fail_json(msg=str(err))
-    if current_vlan == vlan:
-        return False
-    else:
-        try:
-            dev.set(oid, vlan)
+            dev.set(oid, desired_state)
         except:
             module.fail_json(msg='Unable to write to device')
         return True
@@ -277,22 +238,26 @@ def main():
     if m_args['interface_id']:
         interface = m_args['interface_id']
 
-
-    changed = set_interface_mode(dev, interface, m_args['mode'], module)
-    has_changed = changed_status(changed, has_changed)
+    if m_args['mode']:
+        oid = o.vlanTrunkPortDynamicState + "." + str(interface)
+        desired_state = PORT_MODE[m_args['mode']]
+        changed = set_state(dev, oid, desired_state, module)
+        has_changed = changed_status(changed, has_changed)
 
     if m_args['access_vlan']:
-        changed = set_access_vlan(dev, interface, m_args['access_vlan'], module)
+        oid = o.vmVlan + "." + str(interface)
+        desired_state = int(m_args['access_vlan'])
+        changed = set_state(dev, oid, desired_state, module)
         has_changed = changed_status(changed, has_changed)
 
     if m_args['native_vlan']:
-
-        changed = set_native_vlan(dev, interface, m_args['native_vlan'], module)
+        oid = o.vlanTrunkPortNativeVlan + "." + str(interface)
+        desired_state = int(m_args['native_vlan'])
+        changed = set_state(dev, oid, desired_state, module)
         has_changed = changed_status(changed, has_changed)
 
     return_status = { 'changed': has_changed }
 
-    #module.exit_json(**return_status)
     module.exit_json(**return_status)
 
     

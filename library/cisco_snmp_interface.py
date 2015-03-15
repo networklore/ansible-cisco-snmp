@@ -131,51 +131,25 @@ ADMIN_STATE = {
     'testing': 3
 }
 
-
-
 def changed_status(changed, has_changed):
     if changed == True:
         has_changed = True
     return has_changed
 
-def set_interface_admin_status(dev, interface, admin_status, module):
-    oid = o.ifAdminStatus + "." + str(interface)
+def set_state(dev, oid, desired_state, module):
     try:
-        # Source = running config
-        
-        current_admin_status = dev.get_value(oid)
+        current_state = dev.get_value(oid)
     except Exception, err:
         module.fail_json(msg=str(err))
 
-    if current_admin_status == ADMIN_STATE[admin_status]:
+    if current_state == desired_state:
         return False
     else:
         try:
-            dev.set(oid,ADMIN_STATE[admin_status])
+            dev.set(oid, desired_state)
         except:
             module.fail_json(msg='Unable to write to device')
         return True
-
-def set_interface_description(dev, interface, description, module):
-    oid = o.ifAlias + "." + str(interface)
-    try:
-        # Source = running config
-        
-        current_description = dev.get_value(oid)
-    except Exception, err:
-        module.fail_json(msg=str(err))
-
-    if current_description == description:
-        return False
-    else:
-        try:
-            dev.set(oid,description)
-        except:
-            module.fail_json(msg='Unable to write to device')
-        return True
-
-    #else:
-    #    module.fail_json(msg='Unable to find interface')
 
 def main():
     module = AnsibleModule(
@@ -253,13 +227,16 @@ def main():
         interface = m_args['interface_id']
 
     if m_args['description']:
-        changed = set_interface_description(dev, interface, m_args['description'], module)
-        has_changed = changed_status(changed, has_changed)
-  
+        oid = o.ifAlias + "." + str(interface)
+        desired_state = m_args['description']
+        changed = set_state(dev, oid, desired_state, module)
+        has_changed = changed_status(changed, has_changed)        
+
     if m_args['admin_state']:
-        changed = set_interface_admin_status(dev, interface, m_args['admin_state'], module)
+        oid = o.ifAdminStatus + "." + str(interface)
+        desired_state = ADMIN_STATE[m_args['admin_state']]
+        changed = set_state(dev, oid, desired_state, module)
         has_changed = changed_status(changed, has_changed)
-  
 
 
     return_status = { 'changed': has_changed }

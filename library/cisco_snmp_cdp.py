@@ -149,36 +149,17 @@ def changed_status(changed, has_changed):
         has_changed = True
     return has_changed
 
-def set_cdp_global(dev, cdp_mode, module):
-    oid = o.cdpGlobalRun + ".0"
+def set_state(dev, oid, desired_state, module):
     try:
-        
-        current_cdp_state = dev.get_value(oid)
+        current_state = dev.get_value(oid)
     except Exception, err:
         module.fail_json(msg=str(err))
 
-    if current_cdp_state == CDP_STATE[cdp_mode]:
+    if current_state == desired_state:
         return False
     else:
         try:
-            dev.set(oid,CDP_STATE[cdp_mode])
-        except:
-            module.fail_json(msg='Unable to write to device')
-        return True
-
-def set_cdp_interface(dev, interface, cdp_mode, module):
-    oid = o.cdpInterfaceEnable + "." + str(interface)
-    try:
-        
-        current_cdp_state  = dev.get_value(oid)
-    except Exception, err:
-        module.fail_json(msg=str(err))
-
-    if current_cdp_state  == CDP_STATE[cdp_mode]:
-        return False
-    else:
-        try:
-            dev.set(oid,CDP_STATE[cdp_mode])
+            dev.set(oid, desired_state)
         except:
             module.fail_json(msg='Unable to write to device')
         return True
@@ -259,14 +240,16 @@ def main():
         interface = m_args['interface_id']
 
     if m_args['cdp_global']:
-        changed = set_cdp_global(dev, m_args['cdp_global'], module)
+        oid = o.cdpGlobalRun + ".0"
+        desired_state = CDP_STATE[m_args['cdp_global']]
+        changed = set_state(dev, oid, desired_state, module)
         has_changed = changed_status(changed, has_changed)
   
     if m_args['cdp_interface']:
-        changed = set_cdp_interface(dev, interface, m_args['cdp_interface'], module)
+        oid = o.cdpInterfaceEnable + "." + str(interface)
+        desired_state = CDP_STATE[m_args['cdp_interface']]
+        changed = set_state(dev, oid, desired_state, module)
         has_changed = changed_status(changed, has_changed)
-  
-
 
     return_status = { 'changed': has_changed }
 
