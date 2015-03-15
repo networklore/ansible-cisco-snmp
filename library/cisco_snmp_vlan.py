@@ -65,6 +65,19 @@ options:
         description:
             - Encryption key, required if version is authPriv
         required: false
+    vlan_id:
+        description:
+            - The VLAN number
+        required: true
+    vlan_name:
+        description:
+            - The name of the VLAN
+        required: false
+    state:
+        description:
+            - The desired state of the VLAN
+        choices: [ 'absent', 'present' ]
+        required: true
 '''
 
 EXAMPLES = '''
