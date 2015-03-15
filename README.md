@@ -22,6 +22,10 @@ These modules requires:
 ```
 pip install nelsnmp
 ```
+As new modules are added you will need to update nelsnmp to support newer MIBs.
+```
+pip install nelsnmp --upgrade
+```
 If you are running Ansible through a Python virtualenv you might need to change the ansible_python_interpreter variable. Check the hosts file in this repo for an example.
 
 ## Configuration of Cisco device
