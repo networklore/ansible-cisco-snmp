@@ -19,8 +19,7 @@ DOCUMENTATION = '''
 ---
 
 module: cisco_snmp_copy_config
-author: Patrick Ogenstad (@networklore)
-author: Jim Nagy (@jimnagy)
+author: Patrick Ogenstad (@networklore), Jim Nagy (@jimnagy)
 short_description: Copies the configuration.
 description:
     - Copies running or startup config to/from tftp.
@@ -77,7 +76,7 @@ options:
             - Destination for the device config
         choices: [ 'tftp', 'startup-config', 'running-config' ]
         required: true
-    tftp_ip:
+    server:
         description:
             - IP address of the tftp server
         required: false 
@@ -89,7 +88,7 @@ options:
 
 EXAMPLES = '''
 # Copy running config to a tftp server with SNMPv2
-- cisco_snmp_copy_config: host={{ inventory_hostname }} version=2c community=private source=running-config destination=tftp tftp_ip=192.168.1.100 filename=backup.cfg
+- cisco_snmp_copy_config: host={{ inventory_hostname }} version=2c community=private source=running-config destination=tftp server=192.168.1.100 filename=backup.cfg
 
 # Copy backup config from tftp server to startup config with SNMPv3
 - cisco_snmp_copy_config:
@@ -103,7 +102,7 @@ EXAMPLES = '''
     privkey=def6789
     source=tftp
     destination=startup-config
-    tftp_ip=192.168.1.100
+    server=192.168.1.100
     filename=backup.cfg
 '''
 
@@ -130,7 +129,7 @@ NELSNMP_PARAMETERS = (
     'privkey'
 )
 
-def copy_config(dev,module,source,destination,tftp_ip,filename):
+def copy_config(dev,module,source,destination,server,filename):
 
     filetype = {
         'tftp': 1,
@@ -144,7 +143,7 @@ def copy_config(dev,module,source,destination,tftp_ip,filename):
         # Set destination file type
         dev.set(o.ccCopyDestFileType + ".1", filetype[destination])
 
-        if tftp_ip and filename and (source == 'tftp' or destination =='tftp'):
+        if server and filename and (source == 'tftp' or destination =='tftp'):
             #  Protocol = tftp
             dev.set(o.ccCopyProtocol + ".1", 1)
 
@@ -152,7 +151,7 @@ def copy_config(dev,module,source,destination,tftp_ip,filename):
             dev.set(o.ccCopyFileName + ".1", filename, "OctetString")
 
             #  Server Address
-            dev.set(o.ccCopyServerAddress + ".1", tftp_ip, "IpAddress")
+            dev.set(o.ccCopyServerAddress + ".1", server, "IpAddress")
 
         # Run job
         dev.set(o.ccCopyEntryRowStatus + ".1", 1)
@@ -193,7 +192,7 @@ def main():
             privkey=dict(required=False),
             source=dict(required=True, choices=['startup-config', 'running-config', 'tftp']),
             destination=dict(required=True, choices=['startup-config', 'running-config', 'tftp']),
-            tftp_ip=dict(required=False, default=False),
+            server=dict(required=False, default=False),
             filename=dict(required=False, default=False),
             removeplaceholder=dict(required=False)),
             required_together = ( ['username','level','integrity','authkey'],['privacy','privkey'],),
@@ -217,8 +216,8 @@ def main():
             module.fail_json(msg='Privacy algorithm not set when using authPriv')
 
     if m_args['source'] == "tftp" or m_args['destination'] == "tftp":
-        if not m_args['tftp_ip'] or not m_args['filename']:
-            module.fail_json(msg='tftp_ip and filename are required when source or destination is tftp')
+        if not m_args['server'] or not m_args['filename']:
+            module.fail_json(msg='server and filename are required when source or destination is tftp')
 
     nelsnmp_args = {}
     for key in m_args:
@@ -230,7 +229,7 @@ def main():
     except Exception, err:
         module.fail_json(msg=str(err))
 
-    return_status = copy_config(dev,module,m_args['source'],m_args['destination'],m_args['tftp_ip'],m_args['filename'])
+    return_status = copy_config(dev,module,m_args['source'],m_args['destination'],m_args['server'],m_args['filename'])
  
     module.exit_json(**return_status)
     
