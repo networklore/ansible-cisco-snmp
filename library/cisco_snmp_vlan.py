@@ -103,8 +103,8 @@ from collections import defaultdict
 
 try:
     from nelsnmp.snmp import SnmpHandler
-    import nelsnmp.cisco_oids
-    o = nelsnmp.cisco_oids.CiscoOids()  
+    from nelsnmp.vendors.cisco.oids import CiscoOids
+    o = CiscoOids()
     has_nelsnmp = True
 except:
     has_nelsnmp = False
@@ -123,9 +123,9 @@ NELSNMP_PARAMETERS = (
 
 def create_vlan(dev,vlan_id,vlan_name,module):
     vlan_id = str(vlan_id)
- 
+
     try:
-   
+
         dev.set(o.vtpVlanEditOperation + ".1", 2)
         dev.set(o.vtpVlanEditBufferOwner + ".1", "Ansible")
 
@@ -146,7 +146,7 @@ def create_vlan(dev,vlan_id,vlan_name,module):
 
         vartable = dev.getnext(o.vtpVlanName)
     except Exception, err:
-        module.fail_json(msg='Unable to write to device')    
+        module.fail_json(msg='Unable to write to device')
 
     vlan_created = False
     for varbinds in vartable:
@@ -156,7 +156,7 @@ def create_vlan(dev,vlan_id,vlan_name,module):
             if vlan_name != False:
                 if current_vlan_id == vlan_id:
                     vlan_created = True
-            else:    
+            else:
                 if current_vlan_id == vlan_id and current_vlan_name == vlan_name:
                     vlan_created = True
     if not vlan_created:
@@ -172,7 +172,7 @@ def delete_vlan(dev,vlan_id,module):
         dev.set(o.vtpVlanEditOperation + ".1", 4)
         vartable = dev.getnext(o.vtpVlanState)
     except Exception, err:
-        module.fail_json(msg='Unable to write to device')    
+        module.fail_json(msg='Unable to write to device')
 
     for varbinds in vartable:
         for oid, val in varbinds:
@@ -209,7 +209,7 @@ def main():
     if m_args['version'] == "2c":
         if m_args['community'] == False:
             module.fail_json(msg='Community not set when using snmp version 2')
-            
+
     if m_args['version'] == "3":
         if m_args['username'] == None:
             module.fail_json(msg='Username not set when using snmp version 3')
@@ -227,8 +227,8 @@ def main():
     except Exception, err:
         module.fail_json(msg=str(err))
 
-    changed_false = { 'changed': False }                           
-    changed_true = { 'changed': True }                           
+    changed_false = { 'changed': False }
+    changed_true = { 'changed': True }
 
     vlan_defined_name = False
 
@@ -295,9 +295,8 @@ def main():
             delete_vlan(dev, m_args['vlan_id'],module)
 
 
- 
+
     module.exit_json(**return_status)
-    
+
 
 main()
-

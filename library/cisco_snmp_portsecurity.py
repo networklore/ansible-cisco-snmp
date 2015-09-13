@@ -76,7 +76,7 @@ options:
         description:
             - Mode of the interface
         choices: [ 'enabled', 'disabled']
-        required: False        
+        required: False
     max:
         description:
             - The maximum number of mac addresses
@@ -85,17 +85,17 @@ options:
         description:
             - Enable or disable sticky mac addresses
         choices: [ 'enabled', 'disabled']
-        required: False        
+        required: False
     violation:
         description:
             - Enable or disable sticky mac addresses
         choices: [ 'shutdown', 'restrict', 'protect']
-        required: False        
+        required: False
     aging_type:
         description:
             - Set aging type
         choices: [ 'absolute', 'inactivity']
-        required: False        
+        required: False
     aging_time:
         description:
             - Mac address aging time in minutes
@@ -104,7 +104,7 @@ options:
         description:
             - Indicates whether the secure MAC address aging mechanism is enabled on static MAC address entries
         choices: [ 'enabled', 'disabled']
-        required: False        
+        required: False
 '''
 
 EXAMPLES = '''
@@ -131,8 +131,8 @@ from collections import defaultdict
 
 try:
     from nelsnmp.snmp import SnmpHandler
-    import nelsnmp.cisco_oids
-    o = nelsnmp.cisco_oids.CiscoOids()  
+    from nelsnmp.vendors.cisco.oids import CiscoOids
+    o = CiscoOids()
     has_nelsnmp = True
 except:
     has_nelsnmp = False
@@ -227,7 +227,7 @@ def main():
     if m_args['version'] == "2c":
         if m_args['community'] == False:
             module.fail_json(msg='Community not set when using snmp version 2')
-            
+
     if m_args['version'] == "3":
         if m_args['username'] == None:
             module.fail_json(msg='Username not set when using snmp version 3')
@@ -313,7 +313,6 @@ def main():
 
     module.exit_json(**return_status)
 
-    
+
 
 main()
-

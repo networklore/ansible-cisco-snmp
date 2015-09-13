@@ -79,7 +79,7 @@ options:
     server:
         description:
             - IP address of the tftp server
-        required: false 
+        required: false
     filename:
         description:
             - Filename for the config file
@@ -111,8 +111,8 @@ from collections import defaultdict
 
 try:
     from nelsnmp.snmp import SnmpHandler
-    import nelsnmp.cisco_oids
-    o = nelsnmp.cisco_oids.CiscoOids()  
+    from nelsnmp.vendors.cisco.oids import CiscoOids
+    o = CiscoOids()
     has_nelsnmp = True
 except:
     has_nelsnmp = False
@@ -176,7 +176,7 @@ def copy_config(dev,module,source,destination,server,filename):
         module.fail_json(msg='Unable to write to device')
 
 
-    return { 'changed': True } 
+    return { 'changed': True }
 
 def main():
     module = AnsibleModule(
@@ -207,7 +207,7 @@ def main():
     if m_args['version'] == "2c":
         if m_args['community'] == False:
             module.fail_json(msg='Community not set when using snmp version 2')
-            
+
     if m_args['version'] == "3":
         if m_args['username'] == None:
             module.fail_json(msg='Username not set when using snmp version 3')
@@ -230,9 +230,8 @@ def main():
         module.fail_json(msg=str(err))
 
     return_status = copy_config(dev,module,m_args['source'],m_args['destination'],m_args['server'],m_args['filename'])
- 
+
     module.exit_json(**return_status)
-    
+
 
 main()
-
