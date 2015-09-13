@@ -14,8 +14,7 @@ Currently this is only a test and there's a good chance that a lot of the code w
 
 These modules requires:
 
-* [pysnmp](http://pysnmp.sourceforge.net) 4.2.5 or later
-* [nelsnmp](https://github.com/networklore/nelsnmp)
+* [nelsnmp](https://github.com/networklore/nelsnmp) version 0.2.2 or later
 * A good old Cisco switch/router
 
 ## Installation of Ansible module
