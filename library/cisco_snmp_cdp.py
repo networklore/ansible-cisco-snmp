@@ -117,12 +117,11 @@ EXAMPLES = '''
 '''
 
 from ansible.module_utils.basic import *
-from collections import defaultdict
 
 try:
     from nelsnmp.snmp import SnmpHandler
-    import nelsnmp.cisco_oids
-    o = nelsnmp.cisco_oids.CiscoOids()  
+    from nelsnmp.vendors.cisco.oids import CiscoOids
+    o = CiscoOids()
     has_nelsnmp = True
 except:
     has_nelsnmp = False
@@ -144,10 +143,12 @@ CDP_STATE = {
     'disabled': 2
 }
 
+
 def changed_status(changed, has_changed):
-    if changed == True:
+    if changed is True:
         has_changed = True
     return has_changed
+
 
 def set_state(dev, oid, desired_state, module):
     try:
@@ -164,6 +165,7 @@ def set_state(dev, oid, desired_state, module):
             module.fail_json(msg='Unable to write to device')
         return True
 
+
 def main():
     module = AnsibleModule(
         argument_spec=dict(
@@ -173,19 +175,26 @@ def main():
             username=dict(required=False),
             level=dict(required=False, choices=['authNoPriv', 'authPriv']),
             integrity=dict(required=False, choices=['md5', 'sha']),
-            privacy=dict(required=False, choices=['des', '3des', 'aes', 'aes192', 'aes256']),
+            privacy=dict(required=False,
+                         choices=['des', '3des', 'aes', 'aes192', 'aes256']),
             authkey=dict(required=False),
             privkey=dict(required=False),
             cdp_global=dict(required=False, choices=['enabled', 'disabled']),
-            cdp_interface=dict(required=False, choices=['enabled', 'disabled']),
+            cdp_interface=dict(required=False,
+                               choices=['enabled', 'disabled']),
             interface_id=dict(required=False),
             interface_name=dict(required=False),
             removeplaceholder=dict(required=False),
         ),
-        mutually_exclusive=(['interface_id', 'interface_name', 'cdp_global'],['cdp_interface', 'cdp_global']),
-        required_one_of=(['interface_id', 'interface_name', 'cdp_global'],['cdp_interface', 'cdp_global']),
+        mutually_exclusive=(
+            ['interface_id', 'interface_name', 'cdp_global'],
+            ['cdp_interface', 'cdp_global']),
+        required_one_of=(
+            ['interface_id', 'interface_name', 'cdp_global'],
+            ['cdp_interface', 'cdp_global']),
         required_together=(
-            ['username','level','integrity','authkey'],['privacy','privkey'],
+            ['username', 'level', 'integrity', 'authkey'],
+            ['privacy', 'privkey'],
         ),
         supports_check_mode=False)
 
@@ -196,19 +205,20 @@ def main():
 
     # Verify that we receive a community when using snmp v2
     if m_args['version'] == "2c":
-        if m_args['community'] == False:
+        if m_args['community'] is False:
             module.fail_json(msg='Community not set when using snmp version 2')
-            
+
     if m_args['version'] == "3":
-        if m_args['username'] == None:
+        if m_args['username'] is None:
             module.fail_json(msg='Username not set when using snmp version 3')
 
-        if m_args['level'] == "authPriv" and m_args['privacy'] == None:
-            module.fail_json(msg='Privacy algorithm not set when using authPriv')
+        if m_args['level'] == "authPriv" and m_args['privacy'] is None:
+            module.fail_json(
+                msg='Privacy algorithm not set when using authPriv')
 
     nelsnmp_args = {}
     for key in m_args:
-        if key in NELSNMP_PARAMETERS and m_args[key] != None:
+        if key in NELSNMP_PARAMETERS and m_args[key] is not None:
             nelsnmp_args[key] = m_args[key]
 
     try:
@@ -216,7 +226,6 @@ def main():
     except Exception, err:
         module.fail_json(msg=str(err))
 
-    #return_status = { 'changed': False }
     has_changed = False
 
     if m_args['interface_name']:
@@ -230,7 +239,7 @@ def main():
                     if m_args['interface_name'] == val:
                         interface = oid.rsplit('.', 1)[-1]
 
-            if interface == False:
+            if interface is False:
                 module.fail_json(msg='Unable to find interface')
         except Exception, err:
             module.fail_json(msg=str(err))
@@ -244,18 +253,17 @@ def main():
         desired_state = CDP_STATE[m_args['cdp_global']]
         changed = set_state(dev, oid, desired_state, module)
         has_changed = changed_status(changed, has_changed)
-  
+
     if m_args['cdp_interface']:
         oid = o.cdpInterfaceEnable + "." + str(interface)
         desired_state = CDP_STATE[m_args['cdp_interface']]
         changed = set_state(dev, oid, desired_state, module)
         has_changed = changed_status(changed, has_changed)
 
-    return_status = { 'changed': has_changed }
+    return_status = {'changed': has_changed}
 
     module.exit_json(**return_status)
 
-    
+
 
 main()
-
