@@ -2,10 +2,6 @@
 
 This repo contains [Ansible](https://github.com/ansible/ansible) modules which use SNMP to change configuration on Cisco devices. The repo is currently in a proof of concept stage to see how you can manage older devices (which doesn't have a fancy api) with modern IT automation tools. Over at Networklore there's more information about the [Ansible for Cisco IOS SNMP modules](http://networklore.com/ansible-cisco-snmp/).
 
-## Bug
-
-There is a bug in the latest version of pysnmp (4.3.0) which causes issues with the vlan creation. It seems to have been fixed in 4.3.1 which hasn't yet been released. See this [issue](https://github.com/networklore/ansible-cisco-snmp/issues/2) for a workaround.
-
 ## Goal
 
 The goal of this project is to provide idempotent modules for older Cisco devices.
@@ -18,7 +14,7 @@ Currently this is only a test and there's a good chance that a lot of the code w
 
 These modules requires:
 
-* [nelsnmp](https://github.com/networklore/nelsnmp) version 0.2.2 or later
+* [nelsnmp](https://github.com/networklore/nelsnmp) version 0.2.5 or later
 * A good old Cisco switch/router
 
 ## Installation of Ansible module
